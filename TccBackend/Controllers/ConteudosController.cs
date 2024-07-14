@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using TccBackend.Context;
 using TccBackend.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace TccBackend.Controllers
 {
@@ -16,12 +18,13 @@ namespace TccBackend.Controllers
             _context = context;
         }
 
+        [Authorize]
         [HttpGet]
         public ActionResult<IEnumerable<Conteudo>> Get()
         {
             try
             {
-                var conteudos = _context.Conteudos.AsNoTracking().ToList();
+                var conteudos = _context?.Conteudos?.Take(3).ToList();
                 if (conteudos is null)
                 {
                     return NotFound("Conteudos não encontrados");
@@ -35,12 +38,33 @@ namespace TccBackend.Controllers
            
         }
 
+        [Authorize]
+        [HttpGet("GetAll")]
+        public ActionResult<IEnumerable<Conteudo>> GetAll()
+        {
+            try
+            {
+                var conteudos = _context?.Conteudos?.ToList();
+                if (conteudos is null)
+                {
+                    return NotFound("Conteudos não encontrados");
+                }
+                return conteudos;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao buscar conteudos");
+            }
+
+        }
+
+        [Authorize]
         [HttpGet("{id:int}", Name="ObterProduto")]
         public ActionResult<Conteudo> Get(int id)
         {
             try
             {
-                var conteudo = _context.Conteudos.FirstOrDefault(c => c.Id == id);
+                var conteudo = _context?.Conteudos?.FirstOrDefault(c => c.Id == id);
                 if (conteudo is null)
                 {
                     return NotFound("Conteudo não encontrado");
@@ -54,6 +78,7 @@ namespace TccBackend.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public ActionResult<Conteudo> Post([FromBody] Conteudo conteudo)
         {
@@ -61,12 +86,14 @@ namespace TccBackend.Controllers
             {
                 return BadRequest("Conteudo inválido");
             }
-            _context.Conteudos.Add(conteudo);
-            _context.SaveChanges();
+            _context?.Conteudos?.Add(conteudo);
+            _context?.SaveChanges();
             return new CreatedAtActionResult("ObterConteudo",
                 "Conteudos", new { id = conteudo.Id }, conteudo);
         }
 
+
+        [Authorize]
         [HttpPut("{id:int}")]
         public ActionResult<Conteudo> Put(int id, [FromBody] Conteudo conteudo)
         {
@@ -74,7 +101,7 @@ namespace TccBackend.Controllers
             {
                 return BadRequest("Conteudo inválido");
             }
-            var conteudoAtual = _context.Conteudos.FirstOrDefault(c => c.Id == id);
+            var conteudoAtual = _context?.Conteudos?.FirstOrDefault(c => c.Id == id);
             if(conteudoAtual is null)
             {
                 return NotFound("Conteudo não encontrado");
@@ -85,20 +112,21 @@ namespace TccBackend.Controllers
             conteudoAtual.Dados = conteudo.Dados;
             conteudoAtual.Imagem = conteudo.Imagem;
             conteudoAtual.Titulo = conteudo.Titulo;
-            _context.SaveChanges();
+            _context?.SaveChanges();
             return conteudoAtual;
         }
 
+        [Authorize]
         [HttpDelete("{id:int}")]
         public ActionResult Delete(int id)
         {
-            var conteudo = _context.Conteudos.FirstOrDefault(c => c.Id == id);
+            var conteudo = _context?.Conteudos?.FirstOrDefault(c => c.Id == id);
             if(conteudo is null)
             {
                 return NotFound("Conteudo não encontrado");
             }
-            _context.Conteudos.Remove(conteudo);
-            _context.SaveChanges();
+            _context?.Conteudos?.Remove(conteudo);
+            _context?.SaveChanges();
             return Ok(conteudo);
         }
     }
