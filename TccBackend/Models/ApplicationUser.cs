@@ -6,5 +6,6 @@ namespace TccBackend.Models
     {
         public string? RefreshToken { get; set; }
         public DateTime RefreshTokenExpiryTime { get; set; }
+        public List<int> ConteudosVisitados { get; set; } = new List<int>();
     }
 }

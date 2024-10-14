@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TccBackend.Context;
 using TccBackend.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 
 
 namespace TccBackend.Controllers
@@ -59,8 +60,8 @@ namespace TccBackend.Controllers
         }
 
         [Authorize]
-        [HttpGet("{id:int}", Name="ObterProduto")]
-        public ActionResult<Conteudo> Get(int id)
+        [HttpGet("{id:int}", Name = "ObterProduto")]
+        public async Task<ActionResult<Conteudo>> Get(int id)
         {
             try
             {
@@ -69,14 +70,34 @@ namespace TccBackend.Controllers
                 {
                     return NotFound("Conteudo não encontrado");
                 }
+
+                var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("Usuário não autenticado");
+                }
+
+                var usuario = await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+                if (usuario is null)
+                {
+                    return NotFound("Usuário não encontrado");
+                }
+
+                if (!usuario.ConteudosVisitados.Contains(id))
+                {
+                    usuario.ConteudosVisitados.Add(id);
+                    _context.Users.Update(usuario);
+                    await _context.SaveChangesAsync();
+                }
+
                 return conteudo;
             }
             catch (Exception)
             {
-
-                return StatusCode(StatusCodes.Status500InternalServerError, "Conteudo não encontrado");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erro ao buscar conteúdo");
             }
         }
+
 
         [Authorize]
         [HttpPost]

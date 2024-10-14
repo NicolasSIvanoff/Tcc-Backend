@@ -1,7 +1,12 @@
-﻿namespace TccBackend.Models
+﻿using System.Collections.ObjectModel;
+
+namespace TccBackend.Models
 {
     public class RespostasQuiz
     {
+        public RespostasQuiz() { 
+            Respostas = new Collection<Resposta>();
+        }
         public int IdRespostaQuiz { get; set; }
         public int IdQuiz { get; set; }
         public int IdPergunta { get; set; }

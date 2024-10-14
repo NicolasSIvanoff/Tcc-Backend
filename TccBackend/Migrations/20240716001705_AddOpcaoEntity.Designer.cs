@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TccBackend.Context;
 
@@ -11,9 +12,11 @@ using TccBackend.Context;
 namespace TccBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240716001705_AddOpcaoEntity")]
+    partial class AddOpcaoEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,10 +169,6 @@ namespace TccBackend.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("ConteudosVisitados")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
@@ -302,9 +301,8 @@ namespace TccBackend.Migrations
                     b.Property<int>("QuizId")
                         .HasColumnType("int");
 
-                    b.Property<string>("RespostaCorreta")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("RespostaCorreta")
+                        .HasColumnType("int");
 
                     b.Property<int>("Tipo")
                         .HasColumnType("int");
@@ -324,10 +322,10 @@ namespace TccBackend.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdQuiz"));
 
-                    b.Property<int>("Pontuacao")
+                    b.Property<int?>("RespostasQuizIdRespostaQuiz")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RespostasQuizIdRespostaQuiz")
+                    b.Property<int>("pontuacao")
                         .HasColumnType("int");
 
                     b.HasKey("IdQuiz");

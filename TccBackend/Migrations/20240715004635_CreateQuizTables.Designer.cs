@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TccBackend.Context;
 
@@ -11,9 +12,11 @@ using TccBackend.Context;
 namespace TccBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240715004635_CreateQuizTables")]
+    partial class CreateQuizTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -166,10 +169,6 @@ namespace TccBackend.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("ConteudosVisitados")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("varchar(256)");
@@ -259,135 +258,6 @@ namespace TccBackend.Migrations
                     b.ToTable("Conteudos");
                 });
 
-            modelBuilder.Entity("TccBackend.Models.Opcao", b =>
-                {
-                    b.Property<int>("IdOpcao")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdOpcao"));
-
-                    b.Property<string>("Letra")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("PerguntaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Questao")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("IdOpcao");
-
-                    b.HasIndex("PerguntaId");
-
-                    b.ToTable("Opcoes");
-                });
-
-            modelBuilder.Entity("TccBackend.Models.Pergunta", b =>
-                {
-                    b.Property<int>("IdPergunta")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdPergunta"));
-
-                    b.Property<string>("Enunciado")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("Pontuacao")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuizId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RespostaCorreta")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("Tipo")
-                        .HasColumnType("int");
-
-                    b.HasKey("IdPergunta");
-
-                    b.HasIndex("QuizId");
-
-                    b.ToTable("Perguntas");
-                });
-
-            modelBuilder.Entity("TccBackend.Models.Quiz", b =>
-                {
-                    b.Property<int>("IdQuiz")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdQuiz"));
-
-                    b.Property<int>("Pontuacao")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RespostasQuizIdRespostaQuiz")
-                        .HasColumnType("int");
-
-                    b.HasKey("IdQuiz");
-
-                    b.HasIndex("RespostasQuizIdRespostaQuiz");
-
-                    b.ToTable("Quizzes");
-                });
-
-            modelBuilder.Entity("TccBackend.Models.Resposta", b =>
-                {
-                    b.Property<int>("IdResposta")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdResposta"));
-
-                    b.Property<int>("PerguntaId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("RespostasQuizIdRespostaQuiz")
-                        .HasColumnType("int");
-
-                    b.Property<int>("opcaoSelec")
-                        .HasColumnType("int");
-
-                    b.HasKey("IdResposta");
-
-                    b.HasIndex("PerguntaId");
-
-                    b.HasIndex("RespostasQuizIdRespostaQuiz");
-
-                    b.ToTable("Respostas");
-                });
-
-            modelBuilder.Entity("TccBackend.Models.RespostasQuiz", b =>
-                {
-                    b.Property<int>("IdRespostaQuiz")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("IdRespostaQuiz"));
-
-                    b.Property<int>("IdPergunta")
-                        .HasColumnType("int");
-
-                    b.Property<int>("IdQuiz")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Pontuacao")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("data")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("IdRespostaQuiz");
-
-                    b.ToTable("RespostasQuizzes");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -437,69 +307,6 @@ namespace TccBackend.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("TccBackend.Models.Opcao", b =>
-                {
-                    b.HasOne("TccBackend.Models.Pergunta", "Pergunta")
-                        .WithMany("Opcoes")
-                        .HasForeignKey("PerguntaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Pergunta");
-                });
-
-            modelBuilder.Entity("TccBackend.Models.Pergunta", b =>
-                {
-                    b.HasOne("TccBackend.Models.Quiz", "Quiz")
-                        .WithMany("Perguntas")
-                        .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Quiz");
-                });
-
-            modelBuilder.Entity("TccBackend.Models.Quiz", b =>
-                {
-                    b.HasOne("TccBackend.Models.RespostasQuiz", "RespostasQuiz")
-                        .WithMany()
-                        .HasForeignKey("RespostasQuizIdRespostaQuiz");
-
-                    b.Navigation("RespostasQuiz");
-                });
-
-            modelBuilder.Entity("TccBackend.Models.Resposta", b =>
-                {
-                    b.HasOne("TccBackend.Models.Pergunta", "Pergunta")
-                        .WithMany("Respostas")
-                        .HasForeignKey("PerguntaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TccBackend.Models.RespostasQuiz", null)
-                        .WithMany("Respostas")
-                        .HasForeignKey("RespostasQuizIdRespostaQuiz");
-
-                    b.Navigation("Pergunta");
-                });
-
-            modelBuilder.Entity("TccBackend.Models.Pergunta", b =>
-                {
-                    b.Navigation("Opcoes");
-
-                    b.Navigation("Respostas");
-                });
-
-            modelBuilder.Entity("TccBackend.Models.Quiz", b =>
-                {
-                    b.Navigation("Perguntas");
-                });
-
-            modelBuilder.Entity("TccBackend.Models.RespostasQuiz", b =>
-                {
-                    b.Navigation("Respostas");
                 });
 #pragma warning restore 612, 618
         }
