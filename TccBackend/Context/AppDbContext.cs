@@ -22,6 +22,8 @@ namespace TccBackend.Context
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<ApplicationUser>().ToTable("AspNetUsers", "dbo");
+
             modelBuilder.Entity<Pergunta>()
                 .HasKey(p => p.IdPergunta);
 

@@ -39,7 +39,6 @@ namespace TccBackend.Controllers
            
         }
 
-        [Authorize]
         [HttpGet("GetAll")]
         public ActionResult<IEnumerable<Conteudo>> GetAll()
         {

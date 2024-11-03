@@ -54,7 +54,7 @@ namespace TccBackend.Controllers
                 else
                 {
 
-                   _logger.LogInformation(2,"Error");
+                    _logger.LogInformation(2, "Error");
                     return StatusCode(StatusCodes.Status400BadRequest,
                         new Response
                         {
@@ -69,8 +69,8 @@ namespace TccBackend.Controllers
                     Status = "Error",
                     Message = "Role already exists!!"
                 });
-        }  
-        
+        }
+
         [HttpPost]
         [Route("AddUserToRole")]
         public async Task<IActionResult> AddUserToRole(string email, string roleName)
@@ -92,7 +92,7 @@ namespace TccBackend.Controllers
                 else
                 {
 
-                   _logger.LogInformation(1, $"Error: Unable ton add user {user.Email} to the {roleName} role");
+                    _logger.LogInformation(1, $"Error: Unable ton add user {user.Email} to the {roleName} role");
                     return StatusCode(StatusCodes.Status400BadRequest,
                         new Response
                         {
@@ -107,7 +107,7 @@ namespace TccBackend.Controllers
                     Status = "Error",
                     Message = "User does not exist!"
                 });
-          
+
         }
 
         [HttpPost]
