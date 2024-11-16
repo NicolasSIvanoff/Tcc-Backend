@@ -39,6 +39,12 @@ namespace TccBackend.Context
             modelBuilder.Entity<Opcao>()
                 .HasKey(o => o.IdOpcao);
 
+            modelBuilder.Entity<RespostasQuiz>()
+        .HasOne(rq => rq.User) // Propriedade de navegação para ApplicationUser
+        .WithMany() // Configure como um relacionamento unidirecional se ApplicationUser não precisa de uma lista de RespostasQuiz
+        .HasForeignKey(rq => rq.UserId) // Campo chave estrangeira em RespostasQuiz
+        .IsRequired(); // Caso seja obrigatório
+
             // Configurar a relação entre Resposta e Pergunta
             modelBuilder.Entity<Resposta>()
                 .HasOne(r => r.Pergunta)

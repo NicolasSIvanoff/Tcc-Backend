@@ -2,6 +2,7 @@
 {
     public class Quiz
     {
+
         private RespostasQuiz? respostasQuiz;
 
         public int IdQuiz { get; set; }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace TccBackend.Controllers
 {
@@ -110,5 +111,38 @@ namespace TccBackend.Controllers
             await _context.SaveChangesAsync();
             return Ok(quiz);
         }
+
+        [Authorize]
+        [HttpPost("salvarResultado")]
+        public async Task<IActionResult> SaveQuizResultByUserName(string userName, int quizId, int score)
+        {
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
+                if (user == null)
+                {
+                    return NotFound("Usuário não encontrado");
+                }
+
+                var respostasQuiz = new RespostasQuiz
+                {
+                    IdQuiz = quizId,
+                    Pontuacao = score,
+                    Data = DateTime.UtcNow,
+                    Respostas = new List<Resposta>()
+                };
+
+                _context.RespostasQuizzes.Add(respostasQuiz);
+                await _context.SaveChangesAsync();
+
+                return Ok("Resultado salvo com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Erro ao salvar resultado: {ex.Message}");
+            }
+        }
+
     }
+
 }

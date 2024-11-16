@@ -7,7 +7,6 @@ using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 
-
 namespace TccBackend.Controllers
 {
     public class AuthController : ControllerBase
@@ -41,33 +40,31 @@ namespace TccBackend.Controllers
                 var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
                 if (roleResult.Succeeded)
                 {
-                    _logger.LogInformation(1, "Roles Added");
+                    _logger.LogInformation(1, "Roles Adicionada");
 
                     return StatusCode(StatusCodes.Status200OK,
                         new Response
                         {
-                            Status = "Success",
-                            Message =
-                            $"Role {roleName} created successfully!"
+                            Status = "Sucesso",
+                            Message = $"Papel {roleName} criado com sucesso!"
                         });
                 }
                 else
                 {
-
-                    _logger.LogInformation(2, "Error");
+                    _logger.LogInformation(2, "Erro");
                     return StatusCode(StatusCodes.Status400BadRequest,
                         new Response
                         {
-                            Status = "Error",
-                            Message = "Role creation failed! Please check role details and try again."
+                            Status = "Erro",
+                            Message = "Falha ao criar o papel! Verifique os detalhes e tente novamente."
                         });
                 }
             }
             return StatusCode(StatusCodes.Status400BadRequest,
                 new Response
                 {
-                    Status = "Error",
-                    Message = "Role already exists!!"
+                    Status = "Erro",
+                    Message = "O papel já existe!"
                 });
         }
 
@@ -81,33 +78,31 @@ namespace TccBackend.Controllers
                 var result = await _userManager.AddToRoleAsync(user, roleName);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation(1, $"User {user.Email} Added to the {roleName} Role");
+                    _logger.LogInformation(1, $"Usuário {user.Email} adicionado ao papel {roleName}");
                     return StatusCode(StatusCodes.Status200OK,
                         new Response
                         {
-                            Status = "Success",
-                            Message = $"User {user.Email} added to role {roleName} successfully!"
+                            Status = "Sucesso",
+                            Message = $"Usuário {user.Email} adicionado ao papel {roleName} com sucesso!"
                         });
                 }
                 else
                 {
-
-                    _logger.LogInformation(1, $"Error: Unable ton add user {user.Email} to the {roleName} role");
+                    _logger.LogInformation(1, $"Erro: Não foi possível adicionar o usuário {user.Email} ao papel {roleName}");
                     return StatusCode(StatusCodes.Status400BadRequest,
                         new Response
                         {
-                            Status = "Error",
-                            Message = "User addition to role failed! Please check user details and try again."
+                            Status = "Erro",
+                            Message = "Falha ao adicionar o usuário ao papel! Verifique os detalhes e tente novamente."
                         });
                 }
             }
             return StatusCode(StatusCodes.Status400BadRequest,
                 new Response
                 {
-                    Status = "Error",
-                    Message = "User does not exist!"
+                    Status = "Erro",
+                    Message = "Usuário não existe!"
                 });
-
         }
 
         [HttpPost]
@@ -120,25 +115,21 @@ namespace TccBackend.Controllers
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
                 var authClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim(ClaimTypes.Email, user.Email!),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+                {
+                    new Claim(ClaimTypes.Name, user.UserName!),
+                    new Claim(ClaimTypes.Email, user.Email!),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                };
                 foreach (var userRole in userRoles)
                 {
                     authClaims.Add(new Claim(ClaimTypes.Role, userRole));
                 }
 
-                var token = _tokenService.GenerateAccessToken(authClaims,
-                                                              _configuration);
-
+                var token = _tokenService.GenerateAccessToken(authClaims, _configuration);
                 var refreshToken = _tokenService.GenerateRefreshToken();
 
-                _ = int.TryParse(_configuration["JWT:RefreshTokenValidityInMinutes"],
-                                 out int refreshTokenValidityInMinutes);
-                user.RefreshTokenExpiryTime =
-                                 DateTime.Now.AddMinutes(refreshTokenValidityInMinutes);
+                _ = int.TryParse(_configuration["JWT:RefreshTokenValidityInMinutes"], out int refreshTokenValidityInMinutes);
+                user.RefreshTokenExpiryTime = DateTime.Now.AddMinutes(refreshTokenValidityInMinutes);
                 user.RefreshToken = refreshToken;
 
                 await _userManager.UpdateAsync(user);
@@ -150,24 +141,23 @@ namespace TccBackend.Controllers
                     Expiration = token.ValidTo
                 });
             }
-            return Unauthorized();
+            return Unauthorized("Credenciais inválidas.");
         }
 
         [HttpPost]
         [Route("register")]
-
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             if (model == null)
             {
-                return BadRequest(new Response { Status = "Error", Message = "Invalid user data." });
+                return BadRequest(new Response { Status = "Erro", Message = "Dados do usuário inválidos." });
             }
 
             var userExists = await _userManager.FindByNameAsync(model.Name);
             if (userExists != null)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = "User already exists!" });
+                    new Response { Status = "Erro", Message = "Usuário já existe!" });
             }
 
             ApplicationUser user = new()
@@ -183,50 +173,42 @@ namespace TccBackend.Controllers
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 return StatusCode(StatusCodes.Status500InternalServerError,
-                    new Response { Status = "Error", Message = $"User creation failed! {errors}" });
+                    new Response { Status = "Erro", Message = $"Falha ao criar usuário! {errors}" });
             }
 
-            return Ok(new Response { Status = "Success", Message = "User created successfully!" });
+            return Ok(new Response { Status = "Sucesso", Message = "Usuário criado com sucesso!" });
         }
 
         [HttpPost]
         [Route("refresh-token")]
-
         public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
         {
             if (tokenModel is null)
             {
-                return BadRequest("Invalid client request");
+                return BadRequest("Requisição inválida.");
             }
 
-            string? accessToken = tokenModel.AccessToken ??
-                    throw new ArgumentException(nameof(tokenModel));
-
-            string? refreshToken = tokenModel.RefreshToken ??
-                throw new ArgumentException(nameof(tokenModel));
+            string? accessToken = tokenModel.AccessToken ?? throw new ArgumentException(nameof(tokenModel));
+            string? refreshToken = tokenModel.RefreshToken ?? throw new ArgumentException(nameof(tokenModel));
 
             var principal = _tokenService.GetPrincipalFromExpiredToken(accessToken!, _configuration);
 
             if (principal == null)
             {
-                return BadRequest("Invalid access token/refresh token");
+                return BadRequest("Token de acesso ou token de atualização inválido.");
             }
             string username = principal.Identity.Name;
 
             var user = await _userManager.FindByNameAsync(username!);
-            if (user == null || user.RefreshToken != refreshToken
-                             || user.RefreshTokenExpiryTime <= DateTime.Now)
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
             {
-                return BadRequest("Invalid access token/refresh token");
+                return BadRequest("Token de acesso ou token de atualização inválido.");
             }
 
-            var newAccessToken = _tokenService.GenerateAccessToken(
-                                                principal.Claims.ToList(), _configuration);
-
+            var newAccessToken = _tokenService.GenerateAccessToken(principal.Claims.ToList(), _configuration);
             var newRefreshToken = _tokenService.GenerateRefreshToken();
 
             user.RefreshToken = newRefreshToken;
-
             await _userManager.UpdateAsync(user);
 
             return new ObjectResult(new
@@ -239,13 +221,12 @@ namespace TccBackend.Controllers
         [Authorize]
         [HttpPost]
         [Route("revoke/{username}")]
-
         public async Task<IActionResult> Revoke(string username)
         {
             var user = await _userManager.FindByIdAsync(username);
             if (user == null)
             {
-                return BadRequest("Invalid client request");
+                return BadRequest("Requisição inválida.");
             }
             user.RefreshToken = null;
             await _userManager.UpdateAsync(user);

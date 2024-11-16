@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXFileRef, System.Windows.Forms</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXFileRef, System.Windows.Forms</value>
+	</resheader>
+
+	<!-- Traduções -->
+	<data name="Error_UserName_Invalid" xml:space="preserve">
+    <value>O nome de usuário não é válido.</value>
+  </data>
+	<data name="Error_Password_Invalid" xml:space="preserve">
+    <value>A senha não é válida.</value>
+  </data>
+	<data name="Error_UserAlreadyExists" xml:space="preserve">
+    <value>Este usuário já existe.</value>
+  </data>
+	<data name="Error_PasswordTooWeak" xml:space="preserve">
+    <value>A senha deve conter pelo menos um caractere não alfanumérico.</value>
+  </data>
+
+</root>

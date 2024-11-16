@@ -4,7 +4,7 @@ namespace TccBackend.Models
 {
     public class Opcao
     {
-        public int IdOpcao { get; set; } // Chave primária
+        public int IdOpcao { get; set; }
         public string Letra { get; set; }
         public string Questao { get; set; }
         public int PerguntaId { get; set; }

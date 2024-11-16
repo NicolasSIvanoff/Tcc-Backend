@@ -92,11 +92,12 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: origensComAcessoPermitido,
         policy =>
         {
-            policy.WithOrigins("http://localhost:4200")
+            policy.WithOrigins("http://localhost:4200", "https://futuro-financeiro.vercel.app")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         })
 );
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 
 var app = builder.Build();
 
